@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Focus Lock - Study Blocker & Pomodoro",
+  "version": "2.1",
+  "description": "Block distracting sites, lock in with a Pomodoro timer, and unlock mini-games on your breaks.",
+  "permissions": ["declarativeNetRequest", "storage", "alarms", "idle", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Focus Lock",
+    "default_icon": { "16": "icon16.png", "32": "icon32.png", "48": "icon48.png" }
+  },
+  "icons": { "16": "icon16.png", "32": "icon32.png", "48": "icon48.png", "128": "icon128.png" },
+  "web_accessible_resources": [
+    { "resources": ["blocked.html"], "matches": ["<all_urls>"] }
+  ]
+}

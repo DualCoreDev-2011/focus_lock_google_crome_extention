@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Focus Lock · Command Center</title><link rel="stylesheet" href="theme.css">
+<style>
+  .app { display:flex; min-height:100vh; }
+  nav { width:230px; padding:26px 18px; border-right:1px solid var(--line); display:flex; flex-direction:column; gap:6px; background:#08080dcc; }
+  .brand { display:flex; align-items:center; gap:12px; margin-bottom:30px; }
+  .brand .emblem { width:46px; height:46px; }
+  .brand b { display:block; font-size:19px; letter-spacing:.24em; font-weight:800; line-height:1; }
+  .brand span { font-size:9px; letter-spacing:.32em; color:var(--red); }
+  .tab { display:flex; gap:12px; align-items:center; text-align:left; padding:13px 14px; border:none; background:transparent; color:var(--mut); cursor:pointer;
+    font:700 13px var(--font); letter-spacing:.2em; transition:.15s; position:relative;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%); }
+  .tab em { font-style:normal; color:#444458; font-size:11px; }
+  .tab:hover { color:#fff; }
+  .tab.active { color:#fff; background:linear-gradient(90deg,#ff1a3c33,transparent); box-shadow:inset 3px 0 0 var(--red); }
+  .tab.active em { color:var(--red); }
+  #navfoot { margin-top:auto; font-size:10px; letter-spacing:.25em; color:#44445a; line-height:1.8; }
+
+  main { flex:1; padding:34px 44px; max-width:1000px; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  h2 { font-size:24px; letter-spacing:.3em; font-weight:800; } h2 small { font-size:11px; color:var(--red); letter-spacing:.35em; margin-left:12px; font-weight:600; }
+  .hidden { display:none !important; }
+
+  .card { position:relative; background:linear-gradient(135deg,var(--panel2),var(--panel)); padding:22px; margin-bottom:18px; box-shadow:inset 3px 0 0 var(--red2);
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px)); }
+  .ct { font-size:11px; letter-spacing:.3em; color:var(--mut); margin-bottom:14px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  input[type=text], input[type=number] { padding:11px 12px; background:#08080d; border:none; box-shadow:inset 0 0 0 1px var(--line); color:#fff; outline:none; font:600 14px var(--font); letter-spacing:.06em; }
+  input[type=text]:focus, input[type=number]:focus { box-shadow:inset 0 0 0 1px var(--red), 0 0 12px #ff1a3c44; }
+  input[type=number] { width:88px; }
+  input:disabled { opacity:.4; }
+  label.f { font-size:10px; color:var(--mut); display:flex; flex-direction:column; gap:6px; letter-spacing:.22em; }
+  .chk { display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:.14em; color:#c7c7d6; cursor:pointer; }
+  .chk input { accent-color:var(--red); width:16px; height:16px; }
+  #runInfo { font-size:12px; letter-spacing:.2em; color:var(--cyan); margin-top:14px; }
+
+  /* timer ring */
+  .ringwrap { position:relative; width:300px; height:300px; margin:4px auto 26px; }
+  .ringwrap svg { position:absolute; inset:0; }
+  #spin { transform-origin:120px 120px; animation:spin 50s linear infinite; } @keyframes spin { to { transform:rotate(360deg); } }
+  #ringFg { transition:stroke .3s; filter:drop-shadow(0 0 7px currentColor); }
+  .ringtxt { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #bigtime { font-size:64px; font-weight:800; letter-spacing:.06em; line-height:1; }
+  #biglabel { font-size:11px; letter-spacing:.35em; color:var(--mut); margin-top:10px; }
+
+  /* sites */
+  .site { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; margin-bottom:8px; background:#0a0a10; box-shadow:inset 3px 0 0 var(--red); letter-spacing:.14em; font-size:14px; }
+  .site button { background:none; border:none; color:var(--red); font-size:22px; cursor:pointer; line-height:1; } .site button:disabled { opacity:.25; cursor:not-allowed; }
+  .chip { padding:7px 13px; border:none; background:transparent; color:#a9a9bd; cursor:pointer; font:600 12px var(--font); letter-spacing:.1em; box-shadow:inset 0 0 0 1px var(--line);
+    clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%); }
+  .chip:hover:not(:disabled) { color:#fff; box-shadow:inset 0 0 0 1px var(--red); } .chip:disabled { opacity:.25; cursor:not-allowed; }
+  #siteNote { margin-top:12px; font-size:12px; letter-spacing:.14em; color:var(--red); }
+
+  /* stats */
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:18px; }
+  .stat { background:linear-gradient(135deg,var(--panel2),var(--panel)); padding:18px; box-shadow:inset 0 -2px 0 var(--red2);
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%); }
+  .stat b { display:block; font-size:38px; font-weight:800; color:#fff; text-shadow:0 0 16px #ff1a3c88; letter-spacing:.04em; }
+  .stat span { font-size:10px; letter-spacing:.28em; color:var(--mut); }
+  .bars { display:flex; gap:12px; align-items:flex-end; height:170px; }
+  .bar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; font-size:11px; color:var(--mut); gap:6px; letter-spacing:.1em; }
+  .bar i { display:block; width:100%; background:linear-gradient(var(--red),#5a0010); min-height:3px; box-shadow:0 0 12px #ff1a3c55; clip-path:polygon(0 6px,100% 0,100% 100%,0 100%); }
+
+  /* games */
+  .lockedmsg { text-align:center; padding:56px 20px; color:var(--red); font-size:22px; letter-spacing:.3em; }
+  .lockedmsg small { display:block; margin-top:12px; color:var(--mut); font-size:12px; letter-spacing:.2em; }
+  .gtabs { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  canvas { background:#08080d; box-shadow:0 0 0 1px var(--red2), 0 0 24px #ff1a3c33; display:block; margin:14px 0; max-width:100%; }
+  .best { color:var(--mut); font-size:12px; letter-spacing:.2em; }
+  .memgrid { display:grid; grid-template-columns:repeat(4,84px); gap:10px; margin:14px 0; }
+  .mcard { height:84px; font-size:34px; background:#0a0a10; border:none; color:#3d3d52; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line);
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); }
+  .mcard:hover { box-shadow:inset 0 0 0 1px var(--red); }
+  .mcard.up { color:#fff; box-shadow:inset 0 0 0 1px var(--cyan), inset 0 0 16px #00e5ff33; }
+  .react { width:100%; height:220px; display:flex; align-items:center; justify-content:center; font-size:22px; letter-spacing:.22em; cursor:pointer; user-select:none;
+    box-shadow:inset 0 0 0 1px var(--line); clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px); }
+  .wait0 { background:#0a0a10; } .red { background:#3a0712; box-shadow:inset 0 0 0 1px var(--red); } .green { background:#052a30; box-shadow:inset 0 0 0 1px var(--cyan); color:var(--cyan); }
+  .breath { height:340px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:44px; }
+  #breathCircle { width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,#ff1a3c44,#00e5ff11); border:2px solid var(--red); box-shadow:0 0 40px #ff1a3c66; transition:transform 4s ease-in-out; }
+  #breathText { font-size:22px; color:var(--cyan); letter-spacing:.5em; text-shadow:0 0 12px #00e5ff88; }
+</style></head>
+<body>
+<div class="app">
+  <nav>
+    <div class="brand"><div class="emblem" id="emb"></div><div><b>FOCUS LOCK</b><span>// STUDY PROTOCOL</span></div></div>
+    <button class="tab active" data-tab="focus"><em>01</em>FOCUS</button>
+    <button class="tab" data-tab="sites"><em>02</em>SITES</button>
+    <button class="tab" data-tab="games"><em>03</em>GAMES</button>
+    <button class="tab" data-tab="stats"><em>04</em>STATS</button>
+    <div id="navfoot">SYS // ONLINE<br>BUILD 2.1</div>
+  </nav>
+
+  <main>
+    <div class="top"><h2 id="pageTitle">FOCUS<small>COMMAND CENTER</small></h2><span class="pill" id="pill"><i></i><span id="pillTxt">STANDBY</span></span></div>
+
+    <!-- FOCUS -->
+    <section id="tab-focus">
+      <div class="ringwrap">
+        <svg width="300" height="300" viewBox="0 0 240 240">
+          <g id="spin"><circle cx="120" cy="120" r="112" fill="none" stroke="#2c2c3c" stroke-width="5" stroke-dasharray="1.5 9.7"/></g>
+          <circle cx="120" cy="120" r="96" fill="none" stroke="#161621" stroke-width="12"/>
+          <circle cx="120" cy="120" r="80" fill="none" stroke="#242432" stroke-width="1"/>
+          <g transform="rotate(-90 120 120)"><circle id="ringFg" cx="120" cy="120" r="96" fill="none" stroke="#2c2c3c" stroke-width="12"/></g>
+        </svg>
+        <div class="ringtxt"><div id="bigtime">--:--</div><div id="biglabel">STANDBY</div></div>
+      </div>
+
+      <div class="row" style="justify-content:center; margin-bottom:22px">
+        <button class="btn pri" id="startPomo">▶ Start Pomodoro</button>
+        <button class="btn cy" id="skipBreak">Skip break</button>
+        <button class="btn cy" id="endPomo">End pomodoro</button>
+        <button class="btn hold" id="quit">Hold to quit</button>
+      </div>
+
+      <div class="card">
+        <div class="ct">POMODORO CONFIG</div>
+        <div class="row">
+          <label class="f">FOCUS MIN<input type="number" id="sFocus" min="1" max="180"></label>
+          <label class="f">BREAK MIN<input type="number" id="sBrk" min="1" max="60"></label>
+          <label class="f">LONG BREAK<input type="number" id="sLong" min="1" max="90"></label>
+          <label class="f">ROUNDS<input type="number" id="sRounds" min="1" max="12"></label>
+        </div>
+        <label class="chk" style="margin-top:16px"><input type="checkbox" id="sAuto"> AUTO-START NEXT ROUND AFTER BREAKS</label>
+        <div id="runInfo"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">QUICK LOCK · HOLD-TO-QUIT (10s)</div>
+        <div class="row" id="lockRow">
+          <button class="btn" data-min="30">30 min</button><button class="btn" data-min="60">1 hour</button>
+          <button class="btn" data-min="120">2 hours</button><button class="btn" data-min="240">4 hours</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SITES -->
+    <section id="tab-sites" class="hidden">
+      <div class="card">
+        <div class="ct">ADD TARGET</div>
+        <div class="row"><input type="text" id="siteInput" placeholder="e.g. instagram.com" style="flex:1"><button class="btn cy" id="addSite">Add</button></div>
+        <div class="row" id="presets" style="margin-top:16px"></div>
+      </div>
+      <div id="siteList"></div>
+      <label class="chk" style="margin-top:18px"><input type="checkbox" id="alwaysBlock"> ALWAYS BLOCK THESE SITES (EVEN OUTSIDE SESSIONS)</label>
+      <div id="siteNote"></div>
+    </section>
+
+    <!-- GAMES -->
+    <section id="tab-games" class="hidden">
+      <div id="gamesLocked" class="card lockedmsg hidden">GAMES LOCKED<small>FINISH YOUR FOCUS ROUND. GAMES UNLOCK ON BREAKS AND OUTSIDE SESSIONS.</small></div>
+      <div id="gamesBody">
+        <div class="gtabs">
+          <button class="btn cy gsel" data-g="snake">Snake</button><button class="btn cy gsel" data-g="memory">Memory</button>
+          <button class="btn cy gsel" data-g="reaction">Reaction</button><button class="btn cy gsel" data-g="breathe">Breathe</button>
+        </div>
+        <div id="g-none" class="card best">// SELECT A GAME. TAKE A REAL BREAK.</div>
+        <div id="g-snake" class="card hidden">
+          <div class="row"><button class="btn pri" id="snakeStart">Start</button><span id="snakeScore" class="best">SCORE 0</span><span class="best" id="snakeBest"></span></div>
+          <canvas id="snakeCv" width="400" height="400"></canvas><div class="best">ARROW KEYS / WASD</div>
+        </div>
+        <div id="g-memory" class="card hidden">
+          <div class="row"><button class="btn pri" id="memStart">New game</button><span id="memInfo" class="best">MOVES 0</span><span class="best" id="memBest"></span></div>
+          <div class="memgrid" id="memGrid"></div>
+        </div>
+        <div id="g-reaction" class="card hidden"><div class="best" id="reactBest" style="margin-bottom:12px"></div><div class="react wait0" id="reactBox">CLICK TO START</div></div>
+        <div id="g-breathe" class="card hidden"><div class="breath"><div id="breathCircle"></div><div id="breathText">READY</div></div></div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="tab-stats" class="hidden">
+      <div class="grid" id="statCards"></div>
+      <div class="card"><div class="ct">LAST 7 DAYS · MINUTES FOCUSED</div><div class="bars" id="bars"></div></div>
+    </section>
+  </main>
+</div>
+<script src="shared.js"></script><script src="dashboard.js"></script>
+</body></html>

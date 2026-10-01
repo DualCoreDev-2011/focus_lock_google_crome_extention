@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><link rel="stylesheet" href="theme.css">
+<style>
+  body { width:320px; padding:16px; }
+  .head { display:flex; align-items:center; gap:10px; }
+  .head .emblem { width:34px; height:34px; }
+  .title { font-size:18px; font-weight:800; letter-spacing:.22em; line-height:1; }
+  .sub { font-size:9px; color:var(--red); letter-spacing:.3em; margin-top:3px; }
+  .sp { flex:1; }
+  .tg { text-align:center; } .tg small { display:block; font-size:8px; letter-spacing:.2em; color:var(--mut); margin-top:2px; }
+  .panel { margin:14px 0; padding:18px 14px; text-align:center; background:linear-gradient(135deg,#14141e,#0b0b11); box-shadow:inset 3px 0 0 var(--red);
+    clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px)); }
+  #label { font-size:10px; letter-spacing:.3em; color:var(--mut); }
+  #time { font-size:46px; font-weight:800; line-height:1.1; margin-top:4px; color:#3a3a4a; letter-spacing:.06em; }
+  #time.f { color:var(--red); text-shadow:0 0 18px #ff1a3caa; } #time.b { color:var(--cyan); text-shadow:0 0 18px #00e5ffaa; }
+  .row { display:flex; gap:6px; margin-top:8px; } .row .btn { flex:1; padding:9px 4px; }
+  .cap { margin-top:16px; font-size:9px; letter-spacing:.3em; color:var(--mut); }
+  .full { width:100%; margin-top:8px; }
+</style></head>
+<body>
+  <div class="head">
+    <div class="emblem" id="emb"></div>
+    <div><div class="title">FOCUS LOCK</div><div class="sub">// STUDY PROTOCOL</div></div>
+    <div class="sp"></div>
+    <div class="tg"><label class="switch"><input type="checkbox" id="toggle"><span class="slider"></span></label><small>ALWAYS ON</small></div>
+  </div>
+
+  <div class="panel"><div id="label">STANDBY</div><div id="time">--:--</div></div>
+
+  <button class="btn pri full" id="pomo" style="margin-top:0">▶ Start Pomodoro</button>
+  <button class="btn cy full" id="skip" style="display:none">Skip break</button>
+  <button class="btn cy full" id="endp" style="display:none">End pomodoro</button>
+  <button class="btn hold full" id="quit" style="display:none">Hold to quit</button>
+
+  <div class="cap">QUICK LOCK</div>
+  <div class="row">
+    <button class="btn lockbtn" data-min="30">30m</button><button class="btn lockbtn" data-min="60">1h</button>
+    <button class="btn lockbtn" data-min="120">2h</button><button class="btn lockbtn" data-min="240">4h</button>
+  </div>
+  <button class="btn cy full" id="dash" style="margin-top:16px">Open Command Center</button>
+
+  <script src="shared.js"></script><script src="popup.js"></script>
+</body></html>
